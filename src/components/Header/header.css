@@ -5,12 +5,12 @@
     height: 100%;
     overflow: auto;
     position: fixed;
-    background-color: #181c2e;
+    background-color: #1B2431;
 }
 
 .sidebar div {
     background: url('../../assets/cover.png');
-    background-color: #181c2e;
+    background-color: #1B2431;
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -47,7 +47,7 @@
 }
 
 .sidebar a:hover {
-    background-color: #1B2431;
+    background-color: #214761;
     color: #FFF;
 }
 
