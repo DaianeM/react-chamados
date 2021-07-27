@@ -96,7 +96,7 @@ function AuthProvider({children}){
         localStorage.setItem('SistemaUser', JSON.stringify(data));
     }
 
-    //fazer logoout
+    //fazer logout
     async function signOut(){
         await firebase.auth().signOut();
         localStorage.removeItem('SistemaUser');
