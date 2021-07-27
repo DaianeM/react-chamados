@@ -15,21 +15,19 @@ export default function Header(){
             <div>
                 <img src={user.avatarUrl === null? avatar : user.avatarUrl} alt="Foto do perfil"/>
             </div>
-            
 
             <Link to='/dashboard'>
                 <FiHome color='#FFF' size={24}/>
                 Chamados
             </Link>
-            <Link to='/dashboard'>
+            <Link to='/customers'>
                 <FiUser color='#FFF' size={24}/>
                 Clientes
             </Link>
-            <Link to='/dashboard'>
+            <Link to='/profile'>
                 <FiSettings color='#FFF' size={24}/>
                 Configurações
             </Link>
-            
         </div>
     );
 }
