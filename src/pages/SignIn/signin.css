@@ -21,7 +21,7 @@
     display: flex;
     justify-content: center;
     width: 100%;
-    background-color: #214761;
+    background-color: #1E488F;
     border-top-left-radius: 15px;
     border-top-right-radius: 15px;
 }
@@ -60,13 +60,13 @@ form button{
     height: 35px;
     border: 0;
     border-radius: 7px;
-    background-color: #214761;
+    background-color: #1E488F;
     color: #FFF;
     font-size: 1.2em;
 }
 
 .login a{
-    color: #4B006E;
+    color: #1B2431;
     margin: 1.5em 0;
     cursor: pointer;
 }

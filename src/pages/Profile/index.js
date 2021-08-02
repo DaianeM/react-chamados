@@ -2,12 +2,15 @@ import { useState, useContext} from 'react';
 import { AuthContext } from '../../contexts/auth';
 import firebase from '../../services/firebaseConnection';
 
+import { toast } from 'react-toastify';
+
 import { FiSettings, FiUpload } from 'react-icons/fi';
 import Header from '../../components/Header';
 import Title from '../../components/Title';
 
 import avatar from '../../assets/avatar.png';
 import './profile.css';
+
 
 export default function Profile(){
     const { user, signOut, setUser, saveStorageUser } = useContext(AuthContext);
@@ -18,11 +21,59 @@ export default function Profile(){
     const [avatarUrl, setAvatarUrl] = useState(user && user.avatarUrl);
     const [imageAvatar, setImageAvatar] = useState(null);
 
+    //carrega preview da imagem de perfil
+    function handleFile(event){
+        if(event.target.files[0]){
+            const image = event.target.files[0];
+
+            if(image.type === 'image/jpeg' || image.type === 'image/png'){
+                setImageAvatar(image);
+                setAvatarUrl(URL.createObjectURL(event.target.files[0]));
+            }else{
+                toast.info('Envie uma imagem do tipo PNG ou JPEG');
+                setImageAvatar(null);
+                return null;
+            }
+        }
+    }
+
+    async function handleUpload(){
+        const currentUid = user.uid;
+
+        const uploadTask = await firebase.storage()
+        .ref(`images/${currentUid}/${imageAvatar.name}`)
+        .put(imageAvatar)
+        .then(async ()=>{
+            toast.success('Imagem atualizada com sucesso');
+            //vai no storage e busca a url para atualizar o avatarUrl do user
+            await firebase.storage().ref(`images/${currentUid}`)
+            .child(imageAvatar.name).getDownloadURL()
+            .then(async (url)=>{
+                let urlFoto = url;
+                //vai no firebase/firestore salvar a url
+                await firebase.firestore().collection('users')
+                .doc(user.uid)
+                .update({
+                    avatarUrl: urlFoto,
+                    name: name
+                }) 
+                .then(()=>{
+                    let data = {
+                        ...user,
+                        avatarUrl: urlFoto,
+                        name: name
+                    }
+                    setUser(data);
+                    saveStorageUser(data);
+                })
+            })
+        })
+    }
 
     async function handleSave(event){
         event.preventDefault();
 
-        if(imageAvatar === null & name !== ''){
+        if(imageAvatar === null && name !== ''){
             await firebase.firestore().collection('users')
             .doc(user.uid)
             .update({
@@ -39,6 +90,8 @@ export default function Profile(){
             .catch((err)=>{
                 console.log(err);
             })
+        }else if (imageAvatar !== null && name !== ''){
+            handleUpload();
         }
     }
 
@@ -55,7 +108,7 @@ export default function Profile(){
                             <span>
                                 <FiUpload color="#FFF" size={25}/>
                             </span>
-                            <input type="file" accept="image/*"/><br/>
+                            <input type="file" accept="image/*" onChange={handleFile}/><br/>
                             {avatarUrl === null ?
                                 <img src={avatar} width="200" height="200" alt="foto de perfil do usuário"/> :
                                 <img src={avatarUrl} width="200" height="200" alt="foto de perfil do usuário"/>
