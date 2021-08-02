@@ -40,11 +40,10 @@ export default function Profile(){
     async function handleUpload(){
         const currentUid = user.uid;
 
-        const uploadTask = await firebase.storage()
+        await firebase.storage()
         .ref(`images/${currentUid}/${imageAvatar.name}`)
         .put(imageAvatar)
         .then(async ()=>{
-            toast.success('Imagem atualizada com sucesso');
             //vai no storage e busca a url para atualizar o avatarUrl do user
             await firebase.storage().ref(`images/${currentUid}`)
             .child(imageAvatar.name).getDownloadURL()
@@ -65,6 +64,7 @@ export default function Profile(){
                     }
                     setUser(data);
                     saveStorageUser(data);
+                    toast.success('Perfil atualizado com sucesso!');
                 })
             })
         })
@@ -86,6 +86,7 @@ export default function Profile(){
                 }
                 setUser(data);
                 saveStorageUser(data);
+                toast.success('Perfil atualizado com sucesso!');
             })
             .catch((err)=>{
                 console.log(err);
