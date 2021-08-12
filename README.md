@@ -5,4 +5,8 @@
 ## Layout
 
 #### Login
-<img src="https://github.com/DaianeM/assets/blob/main/sistema-chamados.png" width="700px"><br>
+<img src="https://github.com/DaianeM/assets/blob/main/sistema-chamados/sistema-chamados.png" width="650px"><br>
+#### Configuração do Perfil
+<img src="https://github.com/DaianeM/assets/blob/main/sistema-chamados/chamados-config.png" width="650px"><br>
+#### Página do Cliente
+<img src="https://github.com/DaianeM/assets/blob/main/sistema-chamados/chamados-clientes.png" width="650px"><br>
