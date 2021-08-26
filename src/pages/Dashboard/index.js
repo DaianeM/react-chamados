@@ -1,14 +1,77 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FiMessageSquare, FiPlus, FiSearch, FiEdit2 } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
+
+import firebase from '../../services/firebaseConnection';
+import { format } from 'date-fns';
 
 import Header from '../../components/Header';
 import Title from '../../components/Title';
 
 import './dashboard.css';
 
+const listRef = firebase.firestore().collection('chamados').orderBy('created', 'desc')
+
 function Dashboard(){
-    const [calls, setCalls] = useState([1]);
+    const [calls, setCalls] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [isEmpty, setIsEmpty] = useState(false);
+    const [lastDocs, setLastDocs] = useState();
+
+    useEffect(() => {
+        loadChamados()
+
+    return () => {
+
+    }
+
+    }, [])
+
+    async function loadChamados() {
+        await listRef.limit(5)
+        .get()
+        .then((snapshot) => {
+            updateState(snapshot);
+
+        })
+        .catch((err) => {
+            console.log('Erro ao buscar', err)
+            setLoadingMore(false);
+        })
+
+        setLoading(false);
+    }
+
+    async function updateState(snapshot){
+        const isCollectionEmpty = snapshot.size === 0;
+
+        if(!isCollectionEmpty){
+            let lista = [];
+
+            snapshot.forEach((doc) => {
+                lista.push({
+                    id: doc.id,
+                    subject: doc.data().subject,
+                    client: doc.data().client,
+                    clientId: doc.data().clientId,
+                    created: doc.data().created,
+                    createdFormated: format(doc.data().created.toDate(), 'dd/MM/yyyy'),
+                    status: doc.data().status,
+                    supplement: doc.data().supplement, 
+                })
+            })
+
+            const lastDoc = snapshot.docs[snapshot.docs.length -1] //pegando o ultimo documento buscado
+
+            setCalls(calls => [...calls, ...lista]);
+            setLastDocs(lastDoc);
+        }else{
+            setIsEmpty(true);
+        }
+
+        setLoadingMore(false);
+    }
 
     return(
         <div>
