@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 
 import Header from '../../components/Header';
 import Title from '../../components/Title';
+import Modal from '../../components/Modal';
 
 import './dashboard.css';
 
@@ -19,7 +20,25 @@ function Dashboard(){
     const [isEmpty, setIsEmpty] = useState(false);
     const [lastDocs, setLastDocs] = useState();
 
+    const [showPostModal, setShowPostModal] = useState(false);
+    const [detail, setDetail] = useState();
+
     useEffect(() => {
+        async function loadChamados() {
+            await listRef.limit(5)
+            .get()
+            .then((snapshot) => {
+                updateState(snapshot);
+    
+            })
+            .catch((err) => {
+                console.log('Erro ao buscar', err)
+                setLoadingMore(false);
+            })
+    
+            setLoading(false);
+        }
+
         loadChamados()
 
     return () => {
@@ -27,21 +46,6 @@ function Dashboard(){
     } //quando o componente for desmontado
 
     }, [])
-
-    async function loadChamados() {
-        await listRef.limit(5)
-        .get()
-        .then((snapshot) => {
-            updateState(snapshot);
-
-        })
-        .catch((err) => {
-            console.log('Erro ao buscar', err)
-            setLoadingMore(false);
-        })
-
-        setLoading(false);
-    }
 
     async function updateState(snapshot){
         const isCollectionEmpty = snapshot.size === 0;
@@ -82,6 +86,11 @@ function Dashboard(){
         .catch((err) => {
             console.log(err);
         })
+    }
+
+    function togglePostModal(call){
+        setShowPostModal(!showPostModal);
+        setDetail(call);
     }
 
 
@@ -148,10 +157,18 @@ function Dashboard(){
                                                 </td>
                                                 <td data-label="Cadastrado em">{call.createdFormated}</td>
                                                 <td data-label="#">
-                                                    <button className="action" style={{backgroundColor: '#3583f6'}}>
+                                                    <button 
+                                                        className="action" 
+                                                        style={{backgroundColor: '#3583f6'}}
+                                                        onClick={() => {togglePostModal(call)}}
+                                                    >
                                                         <FiSearch size={17} color="#FFF"/>
                                                     </button>
-                                                    <button className="action" style={{backgroundColor: '#F6A935'}}>
+                                                    <button 
+                                                        className="action" 
+                                                        style={{backgroundColor: '#F6A935'}}
+                                                        onClick={() => {}}
+                                                    >
                                                         <FiEdit2 size={17} color="#FFF"/>
                                                     </button>
                                                 </td>
@@ -166,6 +183,12 @@ function Dashboard(){
                     )
                 }
             </div>
+            {showPostModal && (
+                <Modal
+                    conteudo={detail}
+                    close={togglePostModal} 
+                />
+            )}
         </div>
     );
 }
