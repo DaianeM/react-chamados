@@ -24,7 +24,7 @@ function Dashboard(){
 
     return () => {
 
-    }
+    } //quando o componente for desmontado
 
     }, [])
 
@@ -73,6 +73,35 @@ function Dashboard(){
         setLoadingMore(false);
     }
 
+    async function handleMore(){
+        await listRef.startAfter(lastDocs).limit(5)
+        .get()
+        .then((snapshot) => {
+            updateState(snapshot);
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+    }
+
+
+    if(loading) {
+        return(
+            <div>
+                <Header/>
+                <div className="content">
+                    <Title name="Atendimentos">
+                        <FiMessageSquare size={25} />
+                    </Title>
+                    <div className="container dashboard">
+                        <span>Buscando chamados...</span>
+                    </div>
+                </div>
+            </div> 
+
+        );
+    }
+
     return(
         <div>
             <Header/>
@@ -106,24 +135,33 @@ function Dashboard(){
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td data-label="Cliente">Escola do Saber</td>
-                                        <td data-label="Assunto">Suporte</td>
-                                        <td data-label="Status">
-                                            <span className="badge" style={{backgroundColor: '#5cb85c'}}>Em aberto</span>
-                                        </td>
-                                        <td data-label="Cadastrado em">12-08-2021</td>
-                                        <td data-label="#">
-                                            <button className="action" style={{backgroundColor: '#3583f6'}}>
-                                                <FiSearch size={17} color="#FFF"/>
-                                            </button>
-                                            <button className="action" style={{backgroundColor: '#F6A935'}}>
-                                                <FiEdit2 size={17} color="#FFF"/>
-                                            </button>
-                                        </td>
-                                    </tr>
+                                    {calls.map((call, index) => {
+                                        return(
+                                            <tr key={index}>
+                                                <td data-label="Cliente">{call.client}</td>
+                                                <td data-label="Assunto">{call.subject}</td>
+                                                <td data-label="Status">
+                                                    <span className="badge" 
+                                                        style={{backgroundColor: call.status === 'Aberto' ?
+                                                            '#5cb85c' : '#999'
+                                                    }}>{call.status}</span>
+                                                </td>
+                                                <td data-label="Cadastrado em">{call.createdFormated}</td>
+                                                <td data-label="#">
+                                                    <button className="action" style={{backgroundColor: '#3583f6'}}>
+                                                        <FiSearch size={17} color="#FFF"/>
+                                                    </button>
+                                                    <button className="action" style={{backgroundColor: '#F6A935'}}>
+                                                        <FiEdit2 size={17} color="#FFF"/>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
                                 </tbody>
                             </table>
+                            {loadingMore && <h3 style={{textAlign: 'center', marginTop: 15}}>Buscando dados...</h3>}
+                            {!loadingMore && !isEmpty && <button className="btn-more" onClick={handleMore}>Buscar mais</button>}
                         </>
                     )
                 }
