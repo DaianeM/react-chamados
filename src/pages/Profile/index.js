@@ -1,10 +1,10 @@
 import { useState, useContext} from 'react';
+import { toast } from 'react-toastify';
+import { FiSettings, FiUpload } from 'react-icons/fi';
+
 import { AuthContext } from '../../contexts/auth';
 import firebase from '../../services/firebaseConnection';
 
-import { toast } from 'react-toastify';
-
-import { FiSettings, FiUpload } from 'react-icons/fi';
 import Header from '../../components/Header';
 import Title from '../../components/Title';
 

@@ -1,44 +1,73 @@
 import { useState, useEffect, useContext } from 'react';
+import { useHistory, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-
-import firebase from '../../services/firebaseConnection';
-
 import { FiPlus } from 'react-icons/fi';
+
 import Header from '../../components/Header';
 import Title from '../../components/Title';
 
+import firebase from '../../services/firebaseConnection';
 import { AuthContext } from '../../contexts/auth';
 
 import './new.css';
 
 export default function New(){
+    const { id } = useParams();
+    const history = useHistory();
+
     const [loadCustomers, setLoadCustomers] = useState(true);
     const [customers, setCustomers] = useState([]);
     const [customerSelected, setCustomersSelected] = useState(0);
 
-    const [assunto, setAssunto] = useState('Suporte');
+    const [subject, setSubject] = useState('Suporte');
     const [status, setStatus] = useState('Aberto');
-    const [complemento, setComplemento] = useState('');
+    const [supplement, setSupplement] = useState('');
+
+    const [idCustomer, setIdCustomer] = useState(false);
 
     const { user }  = useContext(AuthContext);
 
     async function handleRegister(event){
         event.preventDefault();
 
-        await firebase.firestore().collection('chamados')
+        if(idCustomer){
+            await firebase.firestore().collection('calls')
+            .doc(id)
+            .update({
+                client: customers[customerSelected].fantasyName,
+                clientId: customers[customerSelected].id,
+                subject: subject,
+                status: status,
+                supplement: supplement,
+                userId: user.uid
+            })
+            .then(() => {
+                toast.success('Editado com sucesso!');
+                setSupplement('');
+                setCustomersSelected(0);
+                history.push("/dashboard");
+            })
+            .catch((err) => {
+                toast.error('Ops erro ao resgistrar');
+                console.log(err);
+            })
+            return;
+        }
+
+        await firebase.firestore().collection('calls')
         .add({
             created: new Date(),
             client: customers[customerSelected].fantasyName,
             clientId: customers[customerSelected].id,
-            subject: assunto,
+            subject: subject,
             status: status,
-            supplement: complemento,
+            supplement: supplement,
             userId: user.uid
 
         })
         .then(() => {
             toast.success('Chamado registrado com sucesso.');
-            setComplemento('');
+            setSupplement('');
             setCustomersSelected(0);
         })
         .catch((err) => {
@@ -49,7 +78,7 @@ export default function New(){
     }
 
     function handleSelectAssunto(event){
-        setAssunto(event.target.value);
+        setSubject(event.target.value);
     }
 
     function handleOptionChange(event){
@@ -83,6 +112,10 @@ export default function New(){
 
                 setCustomers(lista);
                 setLoadCustomers(false);
+
+                if(id) {
+                    loadId(lista);
+                }
             })
             .catch((err) => {
                 console.log('Ops deu algum erro!', err);
@@ -91,7 +124,28 @@ export default function New(){
             })
         }
         loadCustomers();
-    }, [])
+
+    }, [id])
+
+    async function loadId(lista){
+        await firebase.firestore().collection('calls')
+        .doc(id)
+        .get()
+        .then((snapshot) => {
+            setSubject(snapshot.data().subject);
+            setStatus(snapshot.data().status);
+            setSupplement(snapshot.data().supplement);
+
+            let index = lista.findIndex(item => item.id === snapshot.data().clientId);
+
+            setCustomersSelected(index);
+            setIdCustomer(true);
+        })
+        .catch((err) => {
+            console.log('Erro no ID passado: ', err);
+            setIdCustomer(false);
+        })
+    }
 
     return(
         <div>
@@ -121,7 +175,7 @@ export default function New(){
                         )}
 
                         <label>Assunto</label>
-                        <select value={assunto} onChange={handleSelectAssunto}>
+                        <select value={subject} onChange={handleSelectAssunto}>
                             <option value="Suporte">Suporte</option>
                             <option value="Visita Técnica">Visita técnica</option>
                             <option value="Financeiro">Financeiro</option>
@@ -160,8 +214,8 @@ export default function New(){
                         <label>Complemento</label>
                         <textarea
                             type="text"
-                            value= {complemento}
-                            onChange={(event) => setComplemento(event.target.value)}
+                            value= {supplement}
+                            onChange={(event) => setSupplement(event.target.value)}
                             placeholder="Descreva o seu problema (opcional)"
                         />
                         <button type="submit">Registrar</button>

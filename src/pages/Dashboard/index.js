@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { FiMessageSquare, FiPlus, FiSearch, FiEdit2 } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
+import { FiMessageSquare, FiPlus, FiSearch, FiEdit2 } from 'react-icons/fi';
 
 import firebase from '../../services/firebaseConnection';
 import { format } from 'date-fns';
@@ -11,7 +11,7 @@ import Modal from '../../components/Modal';
 
 import './dashboard.css';
 
-const listRef = firebase.firestore().collection('chamados').orderBy('created', 'desc')
+const listRef = firebase.firestore().collection('calls').orderBy('created', 'desc')
 
 function Dashboard(){
     const [calls, setCalls] = useState([]);
@@ -24,7 +24,7 @@ function Dashboard(){
     const [detail, setDetail] = useState();
 
     useEffect(() => {
-        async function loadChamados() {
+        async function loadCalls() {
             await listRef.limit(5)
             .get()
             .then((snapshot) => {
@@ -39,7 +39,7 @@ function Dashboard(){
             setLoading(false);
         }
 
-        loadChamados()
+        loadCalls()
 
     return () => {
 
@@ -164,13 +164,13 @@ function Dashboard(){
                                                     >
                                                         <FiSearch size={17} color="#FFF"/>
                                                     </button>
-                                                    <button 
+                                                    <Link 
                                                         className="action" 
                                                         style={{backgroundColor: '#F6A935'}}
-                                                        onClick={() => {}}
+                                                        to={`/new/${call.id}`}
                                                     >
                                                         <FiEdit2 size={17} color="#FFF"/>
-                                                    </button>
+                                                    </Link>
                                                 </td>
                                             </tr>
                                         );

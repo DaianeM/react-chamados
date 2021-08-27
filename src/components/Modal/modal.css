@@ -45,12 +45,12 @@
 
 .modal span {
     font-weight: bold;
-    font-size: 1.2em;
+    font-size: 1.1em;
     color: #121212;
 }
 
-.modal span a {
-    font-weight: 400;
+.modal span i {
+    font-weight: bolder;
     margin-right: 1em;
     padding: 2px 8px;
     border-radius: 3px;
